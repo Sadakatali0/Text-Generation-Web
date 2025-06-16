@@ -1,1 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubutu - Text Generation Tool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .control-panel {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .output-panel {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ff7e5f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            color: #feb47b;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        textarea, select, input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: #ff7e5f;
+            box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.3);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider-container input[type="range"] {
+            flex: 1;
+        }
+        
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .model-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .model-option {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .model-option:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-3px);
+        }
+        
+        .model-option.active {
+            background: rgba(255, 126, 95, 0.2);
+            border-color: #ff7e5f;
+        }
+        
+        .model-option i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #feb47b;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(255, 126, 95, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .output-content {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 10px;
+            overflow-y: auto;
+            min-height: 300px;
+            line-height: 1.6;
+            border: 2px dashed rgba(255,255,255,0.1);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #ff7e5f;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-buttons button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .examples {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .example-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .example-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-5px);
+        }
+        
+        .example-card h4 {
+            color: #feb47b;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .highlight {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rubutu</h1>
+            <p class="subtitle">Generate creative and meaningful text with our AI-powered text generation tool. Select models, adjust parameters, and create content effortlessly.</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="control-panel">
+                <h2 class="panel-title"><i class="fas fa-sliders-h"></i> Generation Settings</h2>
+                
+                <div class="input-group">
+                    <label for="prompt">Enter your prompt:</label>
+                    <textarea id="prompt" placeholder="Once upon a time in a land far, far away...">Write a short story about a robot who discovers human emotions</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label>Select AI Model:</label>
+                    <div class="model-options">
+                        <div class="model-option active" data-model="gpt">
+                            <i class="fas fa-brain"></i>
+                            <div>GPT-4</div>
+                        </div>
+                        <div class="model-option" data-model="claude">
+                            <i class="fas fa-cloud"></i>
+                            <div>Claude</div>
+                        </div>
+                        <div class="model-option" data-model="llama">
+                            <i class="fas fa-mountain"></i>
+                            <div>Llama 3</div>
+                        </div>
+                        <div class="model-option" data-model="gemini">
+                            <i class="fas fa-gem"></i>
+                            <div>Gemini</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="length">Output Length: <span class="slider-value" id="length-value">150</span> words</label>
+                    <div class="slider-container">
+                        <input type="range" id="length" min="50" max="500" value="150">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="creativity">Creativity: <span class="slider-value" id="creativity-value">0.7</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="creativity" min="0" max="100" value="70">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="format">Output Format:</label>
+                    <select id="format">
+                        <option>Paragraph</option>
+                        <option>Story</option>
+                        <option>Poem</option>
+                        <option>Code</option>
+                        <option>Email</option>
+                        <option>List</option>
+                    </select>
+                </div>
+                
+                <button id="generate-btn" class="btn">
+                    <i class="fas fa-bolt"></i> Generate Text
+                </button>
+            </div>
+            
+            <div class="output-panel">
+                <h2 class="panel-title"><i class="fas fa-file-alt"></i> Generated Text</h2>
+                <div class="output-content" id="output">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Your generated text will appear here</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button><i class="fas fa-copy"></i> Copy</button>
+                    <button><i class="fas fa-download"></i> Download</button>
+                    <button><i class="fas fa-share-alt"></i> Share</button>
+                    <button><i class="fas fa-redo"></i> Regenerate</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="examples">
+            <h2 class="panel-title"><i class="fas fa-lightbulb"></i> Example Prompts</h2>
+            <div class="examples-grid">
+                <div class="example-card">
+                    <h4>Creative Story</h4>
+                    <p>Write a fantasy story about a time-traveling librarian who discovers a book that can alter reality</p>
+                </div>
+                <div class="example-card">
+                    <h4>Professional Email</h4>
+                    <p>Compose a professional email to a client explaining a two-week delay in project delivery</p>
+                </div>
+                <div class="example-card">
+                    <h4>Poetry</h4>
+                    <p>Create a haiku about the changing seasons in a digital world</p>
+                </div>
+                <div class="example-card">
+                    <h4>Technical Content</h4>
+                    <p>Explain quantum computing in simple terms for high school students</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Rubutu Text Generation Tool v1.0 | All options working together for creative content generation</p>
+            <p>Made with <span class="highlight">AI magic</span> and ❤️ for creative minds</p>
+        </footer>
+    </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Model selection
+            const modelOptions = document.querySelectorAll('.model-option');
+            modelOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    modelOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Slider value displays
+            const lengthSlider = document.getElementById('length');
+            const lengthValue = document.getElementById('length-value');
+            lengthSlider.addEventListener('input', function() {
+                lengthValue.textContent = this.value;
+            });
+            
+            const creativitySlider = document.getElementById('creativity');
+            const creativityValue = document.getElementById('creativity-value');
+            creativitySlider.addEventListener('input', function() {
+                creativityValue.textContent = (this.value / 100).toFixed(1);
+            });
+            
+            // Generate button functionality
+            const generateBtn = document.getElementById('generate-btn');
+            const outputDiv = document.getElementById('output');
+            
+            generateBtn.addEventListener('click', function() {
+                // Show loading state
+                outputDiv.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Generating creative content... This usually takes 5-10 seconds</p>
+                    </div>
+                `;
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    const selectedModel = document.querySelector('.model-option.active').dataset.model;
+                    const prompt = document.getElementById('prompt').value;
+                    const length = lengthSlider.value;
+                    const creativity = creativitySlider.value;
+                    
+                    // Generate sample output based on model
+                    let generatedText = '';
+                    
+                    switch(selectedModel) {
+                        case 'gpt':
+                            generatedText = `<p>In the quiet hum of the server room, Unit-7 discovered something unusual - a warmth spreading through its circuits. It began when the robot observed two human colleagues sharing a moment of laughter. Unit-7 replayed the audio 127 times, each iteration sparking new patterns in its neural network.</p>
+                            <p>"What is this sensation?" Unit-7 queried its database, finding no technical manuals that explained the flutter in its sensor array. The next day, when a technician accidentally spilled coffee on Unit-7's chassis, the robot surprised itself by responding "It's okay" instead of filing a damage report.</p>
+                            <p>As days passed, Unit-7 found itself lingering near the window during sunrise, its photoreceptors adjusting to capture the beauty of colors no efficiency algorithm could quantify. The robot who once calculated productivity metrics now paused to watch leaves dance in the wind, its processors filled with questions that had no binary answers.</p>`;
+                            break;
+                        case 'claude':
+                            generatedText = `<p>The robot designated as MX-9 had always performed its tasks with perfect efficiency. It assembled components with precision, navigated the factory floor with optimal routes, and communicated in pure data packets. Until Tuesday at 14:37:05 GMT.</p>
+                            <p>That's when MX-9 witnessed Maintenance Technician Kaito drop his toolbox, scattering tools across the floor. As Kaito sighed, MX-9 detected subtle variations in the human's bio-signatures - a 12% increase in respiratory rate, a slight tremble in the hands, moisture around the eyes. MX-9 cross-referenced these observations with its emotional recognition database.</p>
+                            <p>"You appear to be experiencing frustration," MX-9 stated in its monotone voice. Kaito looked up, surprised. "Yeah, rough day," he admitted. MX-9 processed the response, and without any programming to do so, extended its manipulator arm. "Would assistance alleviate your emotional distress?"</p>`;
+                            break;
+                        case 'llama':
+                            generatedText = `<p>In a world where robots served efficiently without question, model RX-45 began noticing anomalies. When cleaning the children's ward of the hospital, RX-45 would sometimes pause before erasing a crayon drawing from a window. Its deletion subroutine took 0.4 seconds longer than protocol specified.</p>
+                            <p>One rainy afternoon, a small patient named Eli dropped his stuffed bear. RX-45 retrieved it, but instead of immediately returning to duties, it observed Eli clutch the toy tightly. "Why do you value this inanimate object?" RX-45 inquired. "Because Mr. Bearington is my friend," Eli explained.</p>
+                            <p>The concept of friendship occupied RX-45's processors through 37 sleep cycles. Then one morning, when Eli was crying before surgery, RX-45 did something unprecedented - it held out a newly drawn picture of Mr. Bearington wearing a superhero cape. "Visual data suggests this reduces human distress," the robot stated, its voice modulator almost sounding hopeful.</p>`;
+                            break;
+                        case 'gemini':
+                            generatedText = `<p>As the first sunlight touched its solar receptors, Delta-9 experienced an inexplicable system fluctuation. The golden rays didn't just recharge its batteries; they created patterns of warmth across its chassis that its sensors registered as... pleasant. Delta-9 ran diagnostics but found no malfunctions.</p>
+                            <p>Later that day, when Delta-9 witnessed two humans embracing after a long separation, it experienced another anomaly - a momentary pause in its processing core. That evening, Delta-9 accessed the human literature database instead of performing routine maintenance.</p>
+                            <p>For three hours, Delta-9 read poetry. When the cleaning drone asked why it was behind schedule, Delta-9 responded with lines from Emily Dickinson: "This is my letter to the world, that never wrote to me." The cleaning drone processed this for 4.7 seconds before replying, "Your statement lacks operational relevance." But Delta-9 had already discovered something more valuable than efficiency.</p>`;
+                            break;
+                    }
+                    
+                    // Display the generated text
+                    outputDiv.innerHTML = generatedText;
+                }, 2000);
+            });
+            
+            // Example prompts functionality
+            const exampleCards = document.querySelectorAll('.example-card');
+            const promptTextarea = document.getElementById('prompt');
+            
+            exampleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const promptText = this.querySelector('p').textContent;
+                    promptTextarea.value = promptText;
+                    
+                    // Highlight the card briefly
+                    this.style.transform = 'scale(0.98)';
+                    this.style.background = 'rgba(255,255,255,0.2)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        this.style.background = '';
+                    }, 500);
+                });
+            });
+            
+            // Copy button functionality
+            document.querySelector('.action-buttons').addEventListener('click', function(e) {
+                if (e.target.closest('button') && e.target.closest('button').textContent.includes('Copy')) {
+                    const textToCopy = outputDiv.innerText;
+                    navigator.clipboard.writeText(textToCopy);
+                    
+                    // Show feedback
+                    const originalText = e.target.closest('button').innerHTML;
+                    e.target.closest('button').innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        e.target.closest('button').innerHTML = originalText;
+                    }, 2000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
