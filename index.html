@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Converter Tool - Tools Hub</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e3f2fd;
+      color: #0d47a1;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    input[type="file"] {
+      margin-bottom: 1rem;
+    }
+    select, button {
+      padding: 0.8rem;
+      margin-top: 1rem;
+      width: 100%;
+      border: 1px solid #64b5f6;
+      border-radius: 6px;
+    }
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 1rem 0;
+      border-radius: 6px;
+    }
+    .download-btn {
+      background-color: #2196f3;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .download-btn:hover {
+      background-color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Image Converter Tool</h1>
+  <div class="container">
+    <input type="file" id="imageInput" accept="image/*" />
+    <select id="formatSelect">
+      <option value="image/jpeg">Convert to JPG</option>
+      <option value="image/png">Convert to PNG</option>
+      <option value="image/webp">Convert to WEBP</option>
+    </select>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="preview" alt="Preview" />
+    <a id="downloadLink" class="download-btn" style="display:none; text-align:center; padding:0.8rem;">Download Converted Image</a>
+  </div>  <script>
+    const imageInput = document.getElementById("imageInput");
+    const formatSelect = document.getElementById("formatSelect");
+    const preview = document.getElementById("preview");
+    const downloadLink = document.getElementById("downloadLink");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    imageInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const format = formatSelect.value;
+            const dataURL = canvas.toDataURL(format);
+            preview.src = dataURL;
+            downloadLink.href = dataURL;
+            downloadLink.download = `converted-image.${format.split("/")[1]}`;
+            downloadLink.style.display = "block";
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    formatSelect.addEventListener("change", function () {
+      if (preview.src) {
+        const img = new Image();
+        img.onload = function () {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const format = formatSelect.value;
+          const dataURL = canvas.toDataURL(format);
+          preview.src = dataURL;
+          downloadLink.href = dataURL;
+          downloadLink.download = `converted-image.${format.split("/")[1]}`;
+        };
+        img.src = preview.src;
+      }
+    });
+  </script></body>
+</html>
